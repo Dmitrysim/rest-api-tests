@@ -1,7 +1,8 @@
 import pytest
-import requests
 from lib.base_case import BaseCase
 from lib.assertions import Assertions
+from lib.requests_lib import RequestsLib
+
 
 class TestUserAuth(BaseCase):
 
@@ -16,7 +17,7 @@ class TestUserAuth(BaseCase):
             'password': '1234'
         }
 
-        response1 = requests.post("https://playground.learnqa.ru/api/user/login", data=data)
+        response1 = RequestsLib.post("/user/login", data=data)
 
         self.auth_sid = self.get_cookie(response1, "auth_sid")
         self.token = self.get_header(response1, "x-csrf-token")
@@ -24,8 +25,8 @@ class TestUserAuth(BaseCase):
 
     def test_auth_user(self):
 
-        response2 = requests.get(
-            "https://playground.learnqa.ru/api/user/auth",
+        response2 = RequestsLib.get(
+            "/user/auth",
             headers={"x-csrf-token": self.token},
             cookies={"auth_sid": self.auth_sid}
         )
@@ -44,7 +45,7 @@ class TestUserAuth(BaseCase):
             'password': '1234'
         }
 
-        response1 = requests.post("https://playground.learnqa.ru/api/user/login", data=data)
+        response1 = RequestsLib.post("/user/login", data=data)
 
         assert "auth_sid" in response1.cookies, "There is no auth cookie in the response"
         assert "x-csrf-token" in response1.headers, "There is no CSRF token header in the response"
@@ -54,11 +55,11 @@ class TestUserAuth(BaseCase):
         token = response1.headers.get("x-csrf-token")
 
         if condition == "no_cookie":
-            response2 = requests.get("https://playground.learnqa.ru/api/user/auth",
+            response2 = RequestsLib.get("/user/auth",
                                      headers={"x-csrf-token": token})
         else:
-            response2 = requests.get("https://playground.learnqa.ru/api/user/auth",
-                                     cookies={"x-csrf-token": auth_sid})
+            response2 = RequestsLib.get("/user/auth",
+                                        cookies={"x-csrf-token": auth_sid})
 
         Assertions.assert_json_value_by_name(
             response2,

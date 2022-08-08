@@ -2,6 +2,7 @@ import json.decoder
 from requests import Response
 from datetime import datetime
 
+
 class BaseCase:
 
     def get_cookie(self, response: Response, cookie_name):
